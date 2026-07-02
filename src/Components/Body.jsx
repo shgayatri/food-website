@@ -4,33 +4,71 @@ import resList from "../utils/mockData";
 
 const Body = () => {
   const [listOfRestaurants, setListOfRestaurant] = useState(resList);
+  const [loading, setLoading] = useState(false);
+  const [isApiData, setIsApiData] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const data = await fetch(
-      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=28.7041&lng=77.1025&page_type=DESKTOP_WEB_LISTING"
-    );
+    try {
+      setLoading(true);
+      console.log("Fetching data from Swiggy API...");
+      
+      const response = await fetch(
+        "/dapi/restaurants/list/v5?lat=28.7041&lng=77.1025&page_type=DESKTOP_WEB_LISTING"
+      );
 
-    const json = await data.json();
-    console.log(json);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    setListOfRestaurant(json?.data?.cards[2]?.data?.data?.cards);
+      const json = await response.json();
+      console.log("Full API Response:", json);
+      
+      // Find the correct card with restaurant data
+      const restaurantCard = json?.data?.cards?.find(
+        (card) => 
+          card?.card?.card?.gridElements?.infoWithStyle?.restaurants
+      );
+      
+      const restaurants = restaurantCard?.card?.card?.gridElements?.infoWithStyle?.restaurants || [];
+      console.log("Extracted Restaurants:", restaurants);
+      console.log("Number of restaurants found:", restaurants.length);
+      
+      if (restaurants.length > 0) {
+        setListOfRestaurant(restaurants);
+        setIsApiData(true);
+        console.log("✅ Successfully loaded API data");
+      } else {
+        console.log("⚠️ No restaurants found in API response, using mock data");
+        setIsApiData(false);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching data:", error);
+      console.log("Using mock data as fallback");
+      setIsApiData(false);
+      
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="body">
       <div className="filter">
+        <div style={{ marginBottom: "10px", fontSize: "14px", color: "#666" }}>
+          {isApiData ? " Showing Live Swiggy Data" : " Showing Mock Data"}
+        </div>
+        
         <button
           className="filter-btn"
           onClick={() => {
-            const filteredList = resList.filter(
+            const filteredList = listOfRestaurants.filter(
               (res) => res.info.avgRating > 4.3
             );
-
-            console.log(filteredList);
+            console.log("Filtered restaurants:", filteredList.length);
             setListOfRestaurant(filteredList);
           }}
         >
@@ -40,21 +78,29 @@ const Body = () => {
         <button
           className="filter-btn"
           onClick={() => {
-            setListOfRestaurant(resList);
+            fetchData(); 
           }}
         >
           All Restaurants
         </button>
       </div>
 
-      <div className="res-container">
-        {listOfRestaurants.map((restaurant) => (
-          <RestaurantCard
-            key={restaurant.info.id}
-            resData={restaurant}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="loading">Loading restaurants...</div>
+      ) : (
+        <div className="res-container">
+          {listOfRestaurants.length === 0 ? (
+            <div>No restaurants found</div>
+          ) : (
+            listOfRestaurants.map((restaurant) => (
+              <RestaurantCard
+                key={restaurant.info.id}
+                resData={restaurant}
+              />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };

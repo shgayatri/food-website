@@ -1,20 +1,47 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
 import Header from "./components/Header";
 import Body from "./components/Body";
-
-
-
-
-
+import About from "./components/About";
+import Contact from "./components/Contact";
+import RestaurantMenu from "./components/Restaurantmenu";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 
 const AppLayout = () => {
   return (
     <div className="app">
       <Header />
-      <Body />
+      <Outlet />
     </div>
   );
 };
 
-export default AppLayout;
+const appRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: <AppLayout />,
+    errorElement: <h1>Oops! Something went wrong.</h1>,
+    children: [
+      {
+        index: true,
+        element: <Body />,
+      },
+      {
+        path: "about",
+        element: <About />,
+      },
+      {
+        path: "contact",
+        element: <Contact />,
+      },
+      {
+        path: "restaurants/:resId",
+        element: <RestaurantMenu />,
+      },
+    ],
+  },
+]);
+
+const App = () => {
+  return <RouterProvider router={appRouter} />;
+};
+
+export default App;

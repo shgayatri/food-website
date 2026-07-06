@@ -102,4 +102,96 @@
   },
 ];
 
+export const mockMenuData = {
+  data: {
+    cards: [
+      {
+        card: {
+          card: {
+            info: {
+              id: "608590",
+              name: "Pizza Hut",
+              cuisines: ["Pizzas", "Pasta"],
+              costForTwoMessage: "₹350 for two",
+              avgRating: 4.6,
+              sla: {
+                deliveryTime: 20,
+                slaString: "20-25 mins",
+              },
+            },
+          },
+        },
+      },
+      {
+        card: {
+          card: {
+            groupedItemsV2: [
+              {
+                groupId: "1",
+                groupName: "Pizzas",
+                items: [
+                  {
+                    id: "1",
+                    name: "Margherita",
+                    description: "Classic pizza with tomato and mozzarella",
+                    price: 25000,
+                  },
+                  {
+                    id: "2",
+                    name: "Pepperoni",
+                    description: "Pepperoni and cheese pizza",
+                    price: 35000,
+                  },
+                  {
+                    id: "3",
+                    name: "Veggie Supreme",
+                    description: "Mixed vegetables pizza",
+                    price: 30000,
+                  },
+                ],
+              },
+              {
+                groupId: "2",
+                groupName: "Pasta",
+                items: [
+                  {
+                    id: "4",
+                    name: "Spaghetti Carbonara",
+                    description: "Creamy pasta with bacon",
+                    price: 32000,
+                  },
+                  {
+                    id: "5",
+                    name: "Fettuccine Alfredo",
+                    description: "Pasta with cream sauce",
+                    price: 28000,
+                  },
+                ],
+              },
+              {
+                groupId: "3",
+                groupName: "Beverages",
+                items: [
+                  {
+                    id: "6",
+                    name: "Coca Cola",
+                    description: "Soft drink",
+                    price: 5000,
+                  },
+                  {
+                    id: "7",
+                    name: "Fresh Juice",
+                    description: "Orange juice",
+                    price: 8000,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      },
+    ],
+  },
+};
+
 export default resList;

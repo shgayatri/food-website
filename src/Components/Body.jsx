@@ -1,13 +1,12 @@
 import RestaurantCard from "./RestaurantCard";
 import { useState, useEffect } from "react";
-import resList from "../utils/mockData";
 import Shimmer from "./Shimmer";
 
 const Body = () => {
-  const [listOfRestaurants, setListOfRestaurant] = useState(resList);
-  const [filteredRestaurants, setFilteredRestaurants] = useState(resList);
+  const [listOfRestaurants, setListOfRestaurant] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isApiData, setIsApiData] = useState(false);
+  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -17,10 +16,23 @@ const Body = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const response = await fetch(
-        "/dapi/restaurants/list/v5?lat=28.7041&lng=77.1025&page_type=DESKTOP_WEB_LISTING"
+        "/dapi/restaurants/list/v5?lat=28.7041&lng=77.1025&page_type=DESKTOP_WEB_LISTING",
+        {
+          method: 'GET',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json',
+            'Referer': 'https://www.swiggy.com',
+          },
+        }
       );
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
 
       const json = await response.json();
 
@@ -35,17 +47,14 @@ const Body = () => {
       if (restaurants.length > 0) {
         setListOfRestaurant(restaurants);
         setFilteredRestaurants(restaurants);
-        setIsApiData(true);
       } else {
-        setListOfRestaurant(resList);
-        setFilteredRestaurants(resList);
-        setIsApiData(false);
+        setError("No restaurants found");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      setListOfRestaurant(resList);
-      setFilteredRestaurants(resList);
-      setIsApiData(false);
+      setError("Failed to fetch restaurants: " + error.message);
+      setListOfRestaurant([]);
+      setFilteredRestaurants([]);
     } finally {
       setLoading(false);
     }
@@ -76,11 +85,11 @@ const Body = () => {
         </div>
 
         <button onClick={handleSearch}>
-          <span>Search</span>
+          Search
         </button>
 
-        <div style={{ marginBottom: "10px", fontSize: "14px", color: "#666" }}>
-          {isApiData ? "Showing Live Swiggy Data" : "Showing Mock Data"}
+        <div style={{ marginBottom: "10px", fontSize: "14px", color: error ? "#d32f2f" : "#666" }}>
+          {error ? "❌ " + error : "📍 Fetching from Swiggy API..."}
         </div>
 
         <button
